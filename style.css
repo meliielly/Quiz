@@ -1,0 +1,176 @@
+* {
+    box-sizing: border-box;
+}
+
+.fundo {
+    background-color:#babada;
+}
+.titulo {
+    margin-top: 20px;
+    margin-left: 45%;
+    font-size: 60px;
+    font-style: italic;
+    font-weight: bold;
+    font-family: "Rye", cursive;
+    color: #33313b;
+    text-shadow: 2px 2px 8px #f6f5f5;
+}
+.tituloCategory {
+    margin-left: 10px;
+    font-size: 60px;
+    font-style: italic;
+    font-weight: bold;
+    font-family: "Rye", cursive;
+    color: #33313b;
+    text-shadow: 2px 2px 8px #f6f5f5;
+}
+.estrutura {
+    margin-top: 35px;
+    margin-left: 380px;
+    width: 1100px;
+    height: 900px;
+    justify-content: center;
+    align-items: center;
+    background: #E6E6FA;
+    color: #FFF;
+    padding: 20px;
+    border: 13px solid #ffffff ;
+    border-radius: 3ch;
+    box-shadow: 14px 14px 14px 9px #33313b;
+}
+.menu {
+    justify-content: center;
+    align-items: center;
+}
+.button-pressed {
+    background-color: black;
+}
+.dificuldades button {
+    width: 400px;
+    height: 100px;
+    margin-left: 330px;
+    margin-top: 10px;
+    background-color: whitesmoke;
+    font-size: 40px;
+    font-weight: bold;
+    border-color:#D8BFD8;
+    border-width: 10px;
+    font-family: "Rye", cursive;
+    color: #33313b;
+    text-shadow: 2px 2px 8px #f6f5f5;
+    border-radius: 15px;
+}
+.categorias {
+    margin-top: 50px; 
+    margin-left: 330px;
+}
+.botao-start {
+    width: 400px;
+    height: 100px;
+    margin-top: 10px;
+    background-color: whitesmoke;
+    font-size: 40px;
+    font-weight: bold;
+    border-color:#babada;
+    border-width: 10px;
+    font-family: "Rye", cursive;
+    color: #33313b;
+    text-shadow: 2px 2px 8px #f6f5f5;
+    border-radius: 15px;
+}
+.quizz {
+    margin-left: 50px;
+}
+.div-pontos {
+    margin-top: 20px;
+    margin-left: 20px;
+    size: 50px;
+    font-style: italic;
+    font-weight: bolder;
+    font-size: 32px;
+    font-family: "Rye", cursive;
+    color: #33313b;
+    text-shadow: 2px 2px 8px #f6f5f5;
+}
+.letra-bonita, .letras, .cabecalho {
+    font-size: 32px;
+    font-family: "Rye", cursive;
+    color: #33313b;
+    text-shadow: 2px 2px 8px #f6f5f5;
+}
+.pergunta {
+    margin-left: 200px;
+    font-size: 25px;
+    font-family: "Rye", cursive;
+    color: #33313b;
+    text-shadow: 2px 2px 8px #f6f5f5;  
+}
+
+#letra-A, #letra-C {
+    margin-left: 90px;
+}
+#letra-B, #letra-D {
+    margin-left: 20px;
+}
+.quadro {
+    margin-left: 8%;
+}
+#opcao-um, #opcao-dois, #opcao-tres, #opcao-quatro{
+    font-size: 25px;
+    font-family: "Rye", cursive;
+    width: 320px;
+    height: 130px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    border-color: #D8BFD8;
+    margin-left: 10px;
+    border-width: 10px;
+    border-radius: 15px;
+}
+.confirma {
+
+    position: relative;
+    width: 160px;
+    height: 60px;
+    margin-right: 50px;
+    margin-left: 400px;
+    background-color: #f5f5f5;
+    font-size: 20px;
+    font-weight: bold;
+    border-color: #babada;
+    border-width: 10px;
+    font-family: "Rye", cursive;
+    color: #33313b;
+    text-shadow: 2px 2px 8px #f6f5f5;
+    border-radius: 15px;
+}
+.skip {
+    background-image: url(img/play-button.svg);
+    background-size: 40px 40px;
+    height: 60px;  
+    width: 60px;
+}
+.opcao {
+    background-color: #f5f5f5;
+}
+.certo {
+    background-color:#babada;
+}
+.errado {
+    background-color:#FFF0F5;
+}
+.botao-guarda {
+    position: fixed;
+    width: 160px;
+    height: 60px;
+    margin-right: 50px;
+    background-color: #f5f5f5;
+    font-size: 20px;
+    font-weight: bold;
+    border-color: #babada;
+    border-width: 10px;
+    font-family: "Rye", cursive;
+    color: #33313b;
+    text-shadow: 2px 2px 8px #f6f5f5;
+    border-radius: 15px;
+}
