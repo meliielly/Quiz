@@ -3,7 +3,7 @@
 }
 
 .fundo {
-    background-color:#babada;
+    background-color:#afafce;
 }
 .titulo {
     margin-top: 20px;
@@ -13,7 +13,7 @@
     font-weight: bold;
     font-family: "Rye", cursive;
     color: #33313b;
-    text-shadow: 2px 2px 8px #f6f5f5;
+    text-shadow: 1px 1px 7px #777792;
 }
 .tituloCategory {
     margin-left: 10px;
@@ -34,9 +34,9 @@
     background: #E6E6FA;
     color: #FFF;
     padding: 20px;
-    border: 13px solid #ffffff ;
+    border: 15px solid #ffffff ;
     border-radius: 3ch;
-    box-shadow: 14px 14px 14px 9px #33313b;
+    box-shadow: 14px 14px 14px 9px #777792;
 }
 .menu {
     justify-content: center;
