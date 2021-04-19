@@ -3,26 +3,26 @@ const proxy = 'https://cors-anywhere.herokuapp.com/';
 
 const elementos = {
     categorias: document.getElementById('opt-categorias'),
-    telaQuiz: document.querySelector('.quizz'),
-    telaInicio: document.querySelector('.inicio'),
-    divQuestao: document.querySelector('.pergunta'),
+    telaQuizz: document.querySelector('.quizz'),
+    telaInicial: document.querySelector('.inicio'),
+    divPergunta: document.querySelector('.pergunta'),
     opcoes: {
         opcaoUm: document.getElementById('opcao-um'),
         opcaoDois: document.getElementById('opcao-dois'),
         opcaoTres: document.getElementById('opcao-tres'),
         opcaoQuatro: document.getElementById('opcao-quatro'),
     },
-    buttons: {
+    botoes: {
         botaoEasy: document.querySelector('.botao-easy'),
         botaoMedium: document.querySelector('.botao-medium'),
         botaoHard: document.querySelector('.botao-hard'),
         botaoStart: document.querySelector('.botao-start'),
     },
     btConfirma: document.querySelector('.confirma'),
-    score: document.querySelector('.score'),
+    pontuacao: document.querySelector('.score'),
     estatisticas: new bootstrap.Modal(document.querySelector('#meu-modal')),
-    textoDesempenho: document.getElementById('texto-desempenho'),
-    botaoGaurdada: document.querySelector('.botao-armazena'),
+    estatisticasTexto: document.getElementById('texto-desempenho'),
+    botaoArmazena: document.querySelector('.botao-guarda'),
     modalArmazena: new bootstrap.Modal(document.querySelector('#modal-questao-guardada')),
     btModalSim: document.querySelector('.bt-modal-sim'),
     btModalNao: document.querySelector('.bt-modal-nao'),
@@ -32,19 +32,10 @@ const elementos = {
     timer: document.getElementById('timer'),
 };
 
-let questaoArmazenada = "";
-
-let quizz = {
-    pergunta: undefined,
-    respostas: [],
-    respostaCerta: undefined,
-    type: undefined,
-};
-
 let categorias = [];
 let questaoAtual = 0;
 let dificuldadeAtual = '';
-let score = 0;
+let pontuacao = 0;
 let gameOver = 3;
 let questoesRespondidas = 0;
 let dificuldade = '';
@@ -54,28 +45,22 @@ let nomeCategoria = '';
 let pontosAdicionais = 0;
 let respondendoQuestaoGuardada = false;
 
-const resetVariaveis = () => {
-    categorias = [];
-    questaoAtual = 0;
-    dificuldadeAtual = '';
-    score = 0;
-    gameOver = 3;
-    questoesRespondidas = 0;
-    dificuldade = '';
-    categoria = '';
-    elementos.score.textContent = score;
-    elementos.buttons.botaoEasy.classList.remove('button-pressed');
-    elementos.buttons.botaoMedium.classList.remove('button-pressed');
-    elementos.buttons.botaoHard.classList.remove('button-pressed');
+let quizz = {
+    pergunta: undefined,
+    respostas: [],
+    respostaCerta: undefined,
+    type: undefined,
 };
+
+let perguntaArmazenada = "";
 
 const iniciarMenu = () => {
     resetVariaveis();
-    buttonReset(elementos.buttons.botaoEasy);
-    buttonReset(elementos.buttons.botaoMedium);
-    buttonReset(elementos.buttons.botaoHard);
-    elementos.telaInicio.style.display = 'flex';
-    elementos.telaQuiz.style.display = 'none';
+    buttonReset(elementos.botoes.botaoEasy);
+    buttonReset(elementos.botoes.botaoMedium);
+    buttonReset(elementos.botoes.botaoHard);
+    elementos.telaInicial.style.display = 'flex';
+    elementos.telaQuizz.style.display = 'none';
     axios.get(`${urlBase}/api_category.php`)
         .then(response => {
             categorias = response.data.trivia_categories;
@@ -89,99 +74,31 @@ const iniciarMenu = () => {
         });
 };
 
-const iniciarJogo = () => {
-    if (elementos.buttons.botaoEasy.classList.contains('isSelected') || elementos.buttons.botaoMedium.classList.contains('isSelected') || elementos.buttons.botaoHard.classList.contains('isSelected')) {
-        elementos.telaInicio.style.display = 'none';
-        elementos.telaQuiz.style.display = 'flex';
-        carregarDados();
-    }
+const resetVariaveis = () => {
+    categorias = [];
+    questaoAtual = 0;
+    dificuldadeAtual = '';
+    pontuacao = 0;
+    gameOver = 3;
+    questoesRespondidas = 0;
+    dificuldade = '';
+    categoria = '';
+    elementos.pontuacao.textContent = pontuacao;
+    elementos.botoes.botaoEasy.classList.remove('button-pressed');
+    elementos.botoes.botaoMedium.classList.remove('button-pressed');
+    elementos.botoes.botaoHard.classList.remove('button-pressed');
 };
-
-const proximaQuestao = () => {
-    if (questaoArmazenada != "") {
-        elementos.modalArmazena.show();
-    }
-    carregarDados();
-};
-
-function decodeHTMLEntities(text) {
-    var textArea = document.createElement('textarea');
-    textArea.innerHTML = text;
-    return textArea.value;
-}
-
-const prepararQuestao = () => {
-    if (gameOver > 0) {
-        elementos.botaoGaurdada.disabled = false;
-        elementos.opcoes.opcaoUm.disabled = false;
-        elementos.opcoes.opcaoDois.disabled = false;
-        elementos.opcoes.opcaoTres.disabled = false;
-        elementos.opcoes.opcaoQuatro.disabled = false;
-        elementos.opcoes.opcaoUm.classList.remove('certo');
-        elementos.opcoes.opcaoUm.classList.remove('errado');
-        elementos.opcoes.opcaoDois.classList.remove('certo');
-        elementos.opcoes.opcaoDois.classList.remove('errado');
-        elementos.opcoes.opcaoTres.classList.remove('certo');
-        elementos.opcoes.opcaoTres.classList.remove('errado');
-        elementos.opcoes.opcaoQuatro.classList.remove('certo');
-        elementos.opcoes.opcaoQuatro.classList.remove('errado');
-        quizz = embaralharRespostas(quizz);
-        elementos.opcoes.opcaoTres.style.display = 'inline';
-        elementos.opcoes.opcaoQuatro.style.display = 'inline';
-        elementos.letraC.style.display = 'inline';
-        elementos.letraD.style.display = 'inline';
-
-        if (quizz.type == "boolean") {
-            elementos.opcoes.opcaoTres.style.display = 'none';
-            elementos.opcoes.opcaoQuatro.style.display = 'none';
-            elementos.letraC.style.display = 'none';
-            elementos.letraD.style.display = 'none';
-        }
-
-        quizz.pergunta = decodeHTMLEntities(quizz.pergunta);
-
-        elementos.divQuestao.textContent = quizz.pergunta;
-        elementos.opcoes.opcaoUm.textContent = quizz.respostas[0];
-        elementos.opcoes.opcaoDois.textContent = quizz.respostas[1];
-        elementos.opcoes.opcaoTres.textContent = quizz.respostas[2];
-        elementos.opcoes.opcaoQuatro.textContent = quizz.respostas[3];
-
-        iniciarProgress();
-    } else {
-        if (categoria == '') {
-            categoria = 'Aleatória';
-        }
-        elementos.textoDesempenho.innerHTML = `<div class="letra-bonita">Pontuação final: ${score}</div>
-                                                <div class="letra-bonita">Questões respondidas: ${questoesRespondidas}</div>
-                                                <div class="letra-bonita">Dificuldade: ${dificuldade}</div>
-                                                <div class="letra-bonita">Categoria: ${categoria}</div>`;
-        elementos.estatisticas.show();
-        iniciarMenu();
-    }
-}
-
-const embaralharRespostas = (questao) => {
-    for (let i = 0; i < 10; i++) {
-        const x = Math.floor(Math.random() * questao.respostas.length);
-        const y = Math.floor(Math.random() * questao.respostas.length);
-        const armazena = questao.respostas[x];
-        questao.respostas[x] = questao.respostas[y];
-        questao.respostas[y] = armazena;
-    }
-
-    return questao;
-}
 
 const carregarDados = () => {
-    if (elementos.buttons.botaoEasy.classList.contains('isSelected')) {
+    if (elementos.botoes.botaoEasy.classList.contains('isSelected')) {
         dificuldade = 'easy';
         nomeDificuldade = '&difficulty=easy';
         dificuldadeAtual = 'easy'
-    } else if (elementos.buttons.botaoMedium.classList.contains('isSelected')) {
+    } else if (elementos.botoes.botaoMedium.classList.contains('isSelected')) {
         dificuldade = 'medium';
         nomeDificuldade = '&difficulty=medium';
         dificuldadeAtual = 'medium';
-    } else if (elementos.buttons.botaoHard.classList.contains('isSelected')) {
+    } else if (elementos.botoes.botaoHard.classList.contains('isSelected')) {
         dificuldade = 'hard';
         nomeDificuldade = '&difficulty=hard';
         dificuldadeAtual = 'hard';
@@ -216,6 +133,94 @@ const carregarDados = () => {
         });
 }
 
+
+const iniciarJogo = () => {
+    if (elementos.botoes.botaoEasy.classList.contains('isSelected') || elementos.botoes.botaoMedium.classList.contains('isSelected') || elementos.botoes.botaoHard.classList.contains('isSelected')) {
+        elementos.telaInicial.style.display = 'none';
+        elementos.telaQuizz.style.display = 'flex';
+        carregarDados();
+    }
+};
+
+const proximaQuestao = () => {
+    if (perguntaArmazenada != "") {
+        elementos.modalArmazena.show();
+    }
+
+    carregarDados();
+};
+
+
+const prepararQuestao = () => {
+    if (gameOver > 0) {
+        elementos.botaoArmazena.disabled = false;
+        elementos.opcoes.opcaoUm.disabled = false;
+        elementos.opcoes.opcaoDois.disabled = false;
+        elementos.opcoes.opcaoTres.disabled = false;
+        elementos.opcoes.opcaoQuatro.disabled = false;
+        elementos.opcoes.opcaoUm.classList.remove('certo');
+        elementos.opcoes.opcaoUm.classList.remove('errado');
+        elementos.opcoes.opcaoDois.classList.remove('certo');
+        elementos.opcoes.opcaoDois.classList.remove('errado');
+        elementos.opcoes.opcaoTres.classList.remove('certo');
+        elementos.opcoes.opcaoTres.classList.remove('errado');
+        elementos.opcoes.opcaoQuatro.classList.remove('certo');
+        elementos.opcoes.opcaoQuatro.classList.remove('errado');
+        quizz = embaralharRespostas(quizz);
+        elementos.opcoes.opcaoTres.style.display = 'inline';
+        elementos.opcoes.opcaoQuatro.style.display = 'inline';
+        elementos.letraC.style.display = 'inline';
+        elementos.letraD.style.display = 'inline';
+
+        if (quizz.type == "boolean") {
+            elementos.opcoes.opcaoTres.style.display = 'none';
+            elementos.opcoes.opcaoQuatro.style.display = 'none';
+            elementos.letraC.style.display = 'none';
+            elementos.letraD.style.display = 'none';
+        }
+
+        quizz.pergunta = decodeHTMLEntities(quizz.pergunta);
+
+        elementos.divPergunta.textContent = quizz.pergunta;
+        elementos.opcoes.opcaoUm.textContent = quizz.respostas[0];
+        elementos.opcoes.opcaoDois.textContent = quizz.respostas[1];
+        elementos.opcoes.opcaoTres.textContent = quizz.respostas[2];
+        elementos.opcoes.opcaoQuatro.textContent = quizz.respostas[3];
+
+        iniciarProgress();
+    } else {
+        if (categoria == '') {
+            categoria = 'Aleatória';
+        }
+        elementos.estatisticasTexto.innerHTML = `<div class="letra-bonita">Final Score: ${pontuacao}</div>
+                                                <div class="letra-bonita">Questions Answered: ${questoesRespondidas}</div>
+                                                <div class="letra-bonita">Level: ${dificuldade}</div>
+                                                <div class="letra-bonita">Category: ${categoria}</div>`;
+        elementos.estatisticas.show();
+        iniciarMenu();
+    }
+}
+
+
+function decodeHTMLEntities(text) {
+    var textArea = document.createElement('textarea');
+    textArea.innerHTML = text;
+    return textArea.value;
+}
+
+const embaralharRespostas = (questao) => {
+    for (let i = 0; i < 10; i++) {
+        const x = Math.floor(Math.random() * questao.respostas.length);
+        const y = Math.floor(Math.random() * questao.respostas.length);
+        const armazena = questao.respostas[x];
+        questao.respostas[x] = questao.respostas[y];
+        questao.respostas[y] = armazena;
+    }
+
+    return questao;
+}
+
+
 const mostrarFeedBack = (questao) => {
     for (let i = 0; i < questao.respostas.length; i++) {
         if (questao.respostas[i] == questao.respostaCerta) {
@@ -242,7 +247,7 @@ const mostrarFeedBack = (questao) => {
     }
 };
 
-elementos.buttons.botaoStart.addEventListener('click', () => {
+elementos.botoes.botaoStart.addEventListener('click', () => {
     iniciarJogo();
 });
 
@@ -250,42 +255,6 @@ const buttonReset = (botao) => {
     botao.classList.remove('isSelected');
     botao.classList.remove('isSelected');
 }
-
-elementos.buttons.botaoEasy.addEventListener('click', () => {
-    buttonReset(elementos.buttons.botaoEasy);
-    buttonReset(elementos.buttons.botaoMedium);
-    buttonReset(elementos.buttons.botaoHard);
-    elementos.buttons.botaoEasy.classList.add('isSelected');
-    elementos.buttons.botaoMedium.classList.add('notSelected');
-    elementos.buttons.botaoHard.classList.add('notSelected');
-    elementos.buttons.botaoHard.classList.remove('button-pressed');
-    elementos.buttons.botaoMedium.classList.remove('button-pressed');
-    elementos.buttons.botaoEasy.classList.add('button-pressed');
-})
-
-elementos.buttons.botaoMedium.addEventListener('click', () => {
-    buttonReset(elementos.buttons.botaoEasy);
-    buttonReset(elementos.buttons.botaoMedium);
-    buttonReset(elementos.buttons.botaoHard);
-    elementos.buttons.botaoEasy.classList.add('notSelected');
-    elementos.buttons.botaoMedium.classList.add('isSelected');
-    elementos.buttons.botaoHard.classList.add('notSelected');
-    elementos.buttons.botaoEasy.classList.remove('button-selected');
-    elementos.buttons.botaoHard.classList.remove('button-selected');
-    elementos.buttons.botaoMedium.classList.add('button-pressed');
-})
-
-elementos.buttons.botaoHard.addEventListener('click', () => {
-    buttonReset(elementos.buttons.botaoEasy);
-    buttonReset(elementos.buttons.botaoMedium);
-    buttonReset(elementos.buttons.botaoHard);
-    elementos.buttons.botaoEasy.classList.add('notSelected');
-    elementos.buttons.botaoMedium.classList.add('notSelected');
-    elementos.buttons.botaoHard.classList.add('isSelected');
-    elementos.buttons.botaoEasy.classList.remove('button-selected');
-    elementos.buttons.botaoMedium.classList.remove('button-selected');
-    elementos.buttons.botaoHard.classList.add('button-pressed');
-})
 
 const definePontos = () => {
     if (dificuldadeAtual == 'easy') {
@@ -301,16 +270,54 @@ const definePontos = () => {
     }
 
     if (dificuldadeAtual == 'easy') {
-        score = parseInt(elementos.score.textContent) + pontosAdicionais;
-        elementos.score.textContent = score;
+        pontuacao = parseInt(elementos.pontuacao.textContent) + pontosAdicionais;
+        elementos.pontuacao.textContent = pontuacao;
     } else if (dificuldadeAtual == 'medium') {
-        score = parseInt(elementos.score.textContent) + pontosAdicionais;
-        elementos.score.textContent = score;
+        pontuacao = parseInt(elementos.pontuacao.textContent) + pontosAdicionais;
+        elementos.pontuacao.textContent = pontuacao;
     } else if (dificuldadeAtual == 'hard') {
-        score = parseInt(elementos.score.textContent) + pontosAdicionais;
-        elementos.score.textContent = score;
+        pontuacao = parseInt(elementos.pontuacao.textContent) + pontosAdicionais;
+        elementos.pontuacao.textContent = pontuacao;
     }
 };
+
+
+elementos.botoes.botaoEasy.addEventListener('click', () => {
+    buttonReset(elementos.botoes.botaoEasy);
+    buttonReset(elementos.botoes.botaoMedium);
+    buttonReset(elementos.botoes.botaoHard);
+    elementos.botoes.botaoEasy.classList.add('isSelected');
+    elementos.botoes.botaoMedium.classList.add('notSelected');
+    elementos.botoes.botaoHard.classList.add('notSelected');
+    elementos.botoes.botaoHard.classList.remove('button-pressed');
+    elementos.botoes.botaoMedium.classList.remove('button-pressed');
+    elementos.botoes.botaoEasy.classList.add('button-pressed');
+})
+
+elementos.botoes.botaoMedium.addEventListener('click', () => {
+    buttonReset(elementos.botoes.botaoEasy);
+    buttonReset(elementos.botoes.botaoMedium);
+    buttonReset(elementos.botoes.botaoHard);
+    elementos.botoes.botaoEasy.classList.add('notSelected');
+    elementos.botoes.botaoMedium.classList.add('isSelected');
+    elementos.botoes.botaoHard.classList.add('notSelected');
+    elementos.botoes.botaoEasy.classList.remove('button-selected');
+    elementos.botoes.botaoHard.classList.remove('button-selected');
+    elementos.botoes.botaoMedium.classList.add('button-pressed');
+})
+
+elementos.botoes.botaoHard.addEventListener('click', () => {
+    buttonReset(elementos.botoes.botaoEasy);
+    buttonReset(elementos.botoes.botaoMedium);
+    buttonReset(elementos.botoes.botaoHard);
+    elementos.botoes.botaoEasy.classList.add('notSelected');
+    elementos.botoes.botaoMedium.classList.add('notSelected');
+    elementos.botoes.botaoHard.classList.add('isSelected');
+    elementos.botoes.botaoEasy.classList.remove('button-selected');
+    elementos.botoes.botaoMedium.classList.remove('button-selected');
+    elementos.botoes.botaoHard.classList.add('button-pressed');
+})
+
 
 const verificarAcerto = () => {
     if (elementos.opcoes.opcaoUm.classList.contains('isSelected') && elementos.opcoes.opcaoUm.textContent == quizz.respostaCerta) {
@@ -324,18 +331,18 @@ const verificarAcerto = () => {
     } else {
         gameOver--;
         if (dificuldadeAtual == 'easy') {
-            score = parseInt(elementos.score.textContent) - 5;
-            elementos.score.textContent = score;
+            pontuacao = parseInt(elementos.pontuacao.textContent) - 5;
+            elementos.pontuacao.textContent = pontuacao;
         } else if (dificuldadeAtual == 'medium') {
-            score = parseInt(elementos.score.textContent) - 8;
-            elementos.score.textContent = score;
+            pontuacao = parseInt(elementos.pontuacao.textContent) - 8;
+            elementos.pontuacao.textContent = pontuacao;
         } else if (dificuldadeAtual == 'hard') {
-            score = parseInt(elementos.score.textContent) - 10;
-            elementos.score.textContent = score;
+            pontuacao = parseInt(elementos.pontuacao.textContent) - 10;
+            elementos.pontuacao.textContent = pontuacao;
         }
     }
     if (respondendoQuestaoGuardada == true) {
-        questaoArmazenada = "";
+        perguntaArmazenada = "";
         respondendoQuestaoGuardada = false;
     }
 };
@@ -344,7 +351,7 @@ elementos.btConfirma.addEventListener('click', () => {
     if (elementos.btConfirma.textContent != '' && (elementos.opcoes.opcaoUm.classList.contains('isSelected') || (elementos.opcoes.opcaoDois.classList.contains('isSelected')) || elementos.opcoes.opcaoTres.classList.contains('isSelected') || elementos.opcoes.opcaoQuatro.classList.contains('isSelected'))) {
         elementos.opcoes.opcaoUm.disabled = true;
         elementos.opcoes.opcaoDois.disabled = true;
-        elementos.botaoGaurdada.disabled = true;
+        elementos.botaoArmazena.disabled = true;
         elementos.opcoes.opcaoTres.disabled = true;
         elementos.opcoes.opcaoQuatro.disabled = true;
         elementos.btConfirma.textContent = '';
@@ -357,7 +364,7 @@ elementos.btConfirma.addEventListener('click', () => {
         buttonReset(elementos.opcoes.opcaoDois);
         buttonReset(elementos.opcoes.opcaoTres);
         buttonReset(elementos.opcoes.opcaoQuatro);
-        elementos.botaoGaurdada.disabled = false;
+        elementos.botaoArmazena.disabled = false;
         elementos.opcoes.opcaoUm.disabled = false;
         elementos.opcoes.opcaoDois.disabled = false;
         elementos.opcoes.opcaoTres.disabled = false;
@@ -373,8 +380,8 @@ elementos.btConfirma.addEventListener('click', () => {
         elementos.opcoes.opcaoTres.classList.remove('errado');
         elementos.opcoes.opcaoQuatro.classList.remove('certo');
         elementos.opcoes.opcaoQuatro.classList.remove('errado');
-        if (questaoArmazenada == "") {
-            elementos.botaoGaurdada.disabled = false;
+        if (perguntaArmazenada == "") {
+            elementos.botaoArmazena.disabled = false;
         }
         proximaQuestao();
     }
@@ -398,7 +405,7 @@ iniciarProgress = () => {
     elementos.progress.setAttribute("aria-valuenow", `100`)
 
     const interval = setInterval(() => {
-        elementos.timer.textContent = `Timer: ${contagem / 100}`;
+        elementos.timer.textContent = `Tempo: ${contagem / 100}`;
         --contagem;
 
         const aux = contagem * 100 / total;
@@ -437,7 +444,8 @@ elementos.opcoes.opcaoUm.addEventListener('click', () => {
     buttonReset(elementos.opcoes.opcaoTres);
     buttonReset(elementos.opcoes.opcaoQuatro);
 
-    elementos.opcoes.opcaoUm.classList.add('isSelected');
+    elementos.opcoes.opcaoUm.classLis
+    t.add('isSelected');
 });
 
 elementos.opcoes.opcaoDois.addEventListener('click', () => {
@@ -467,16 +475,16 @@ elementos.opcoes.opcaoQuatro.addEventListener('click', () => {
     elementos.opcoes.opcaoQuatro.classList.add('isSelected');
 });
 
-elementos.botaoGaurdada.addEventListener('click', () => {
-    if (questaoArmazenada == "") {
-        elementos.botaoGaurdada.disabled = true;
-        questaoArmazenada = JSON.stringify(quizz);
+elementos.botaoArmazena.addEventListener('click', () => {
+    if (perguntaArmazenada == "") {
+        elementos.botaoArmazena.disabled = true;
+        perguntaArmazenada = JSON.stringify(quizz);
         proximaQuestao();
     }
 });
 
 elementos.btModalSim.addEventListener('click', () => {
-    quizz = JSON.parse(questaoArmazenada);
+    quizz = JSON.parse(perguntaArmazenada);
     respondendoQuestaoGuardada = true;
     prepararQuestao();
 });
